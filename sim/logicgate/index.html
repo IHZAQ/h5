@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @font-face {
+            font-family: Minecraft;
+            src: url('minecraft.ttf') format('truetype');
+        }
+
+        body {
+            background-color: #232323;
+            font-family: Minecraft;
+        }
+
+        table,
+        th,
+        td {
+            border: 2px solid black;
+            margin: auto;
+        }
+
+        table {
+            background-color: black;
+        }
+
+        th {
+            background-color: white;
+        }
+
+        .f {
+            background-color: red;
+        }
+
+        .t {
+            background-color: green;
+        }
+
+        #and {
+            background-color: seagreen;
+            height: 100%;
+            width: 40%;
+        }
+
+        #or {
+            background-color: aqua;
+            height: 100%;
+            width: 40%;
+        }
+
+        #not {
+            background-color: orange;
+            height: 100%;
+            width: 20%;
+        }
+
+        .led {
+            width: 20px;
+            height: 50px;
+            background-color: red;
+            border-radius: 10%;
+            margin: auto;
+            text-align: center;
+        }
+
+        #logics {
+            display: flex;
+        }
+
+        button {
+            width: 50%;
+            height: 100%;
+            margin: auto;
+            background-color: red;
+            font-family: Minecraft;
+        }
+
+        .buttons {
+            margin: auto;
+            height: 50px;
+            width: 100px;
+            display: flex;
+        }
+    </style>
+    <title>Logic Gate Simulator</title>
+<script type="text/javascript" src="https://tiiny.host/ad-script.js"></script><script defer data-domain="violet-olympia-37.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script></head>
+
+<body>
+    <div id="logics">
+        <div id="and" class="lg">
+            <div class="led">X</div>
+            <div class="buttons">
+                <button id="a1" onclick="and(0)">A</button>
+                <button id="b1" onclick="and(1)">B</button>
+            </div>
+            <table>
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>X</th>
+                </tr>
+                <tr>
+                    <td class="f">0</td>
+                    <td class="f">0</td>
+                    <td class="f">0</td>
+                </tr>
+                <tr>
+                    <td class="f">0</td>
+                    <td class="t">1</td>
+                    <td class="f">0</td>
+                </tr>
+                <tr>
+                    <td class="t">1</td>
+                    <td class="f">0</td>
+                    <td class="f">0</td>
+                </tr>
+                <tr>
+                    <td class="t">1</td>
+                    <td class="t">1</td>
+                    <td class="t">1</td>
+                </tr>
+            </table>
+            <p>DAN/AND</p>
+        </div>
+        <div id="or" class="lg">
+            <div class="led">X</div>
+            <div class="buttons">
+                <button id="a2" onclick="or(0)">A</button>
+                <button id="b2" onclick="or(1)">B</button>
+            </div>
+            <table>
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>X</th>
+                </tr>
+                <tr>
+                    <td class="f">0</td>
+                    <td class="f">0</td>
+                    <td class="f">0</td>
+                </tr>
+                <tr>
+                    <td class="f">0</td>
+                    <td class="t">1</td>
+                    <td class="t">1</td>
+                </tr>
+                <tr>
+                    <td class="t">1</td>
+                    <td class="f">0</td>
+                    <td class="t">1</td>
+                </tr>
+                <tr>
+                    <td class="t">1</td>
+                    <td class="t">1</td>
+                    <td class="t">1</td>
+                </tr>
+            </table>
+            <p>ATAU/OR</p>
+        </div>
+        <div id="not" class="lg">
+            <div class="led">X</div>
+            <div class="buttons">
+                <button id="a3" onclick="not()">A</button>
+            </div>
+            <table>
+                <tr>
+                    <th>A</th>
+                    <th>X</th>
+                </tr>
+                <tr>
+                    <td class="f">0</td>
+                    <td class="t">1</td>
+                </tr>
+                <tr>
+                    <td class="t">1</td>
+                    <td class="f">0</td>
+                </tr>
+            </table>
+            <p>TAK/NOT</p>
+        </div>
+    </div>
+    <script>
+        let obj = {
+            a1: false,
+            b1: false,
+            a2: false,
+            b2: false,
+            a3: false
+        }
+        let led = document.getElementsByClassName("led")
+        led[2].style.backgroundColor = "green"
+        let buttons = document.getElementsByTagName("button")
+        function switchColor(int) {
+            buttons[int].style.backgroundColor = obj[buttons[int].id] ? "green" : "red";
+        }
+        function and(int) {
+            if (!int) obj.a1 = !obj.a1;
+            if (int) obj.b1 = !obj.b1;
+            led[0].style.backgroundColor = (obj.a1 && obj.b1) ? "green" : "red";
+            switchColor(int)
+        }
+        function or(int) {
+            if (!int) obj.a2 = !obj.a2;
+            if (int) obj.b2 = !obj.b2;
+            led[1].style.backgroundColor = (obj.a2 || obj.b2) ? "green" : "red";
+            switchColor(2 + int)
+        }
+        function not() {
+            obj.a3 = !obj.a3
+            led[2].style.backgroundColor = (!obj.a3) ? "green" : "red";
+            switchColor(4)
+        }
+    </script>
+</body>
+
+</html>
