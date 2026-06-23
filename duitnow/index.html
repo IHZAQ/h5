@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Built by Haziq -->
+    <title>DuitNow QR Studio</title>
+    
+    <!-- 1. Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
+    <!-- 2. QR Generation & Styling Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+    
+    <style>
+        :root {
+            --duitnow-pink: #ED2E67;
+            --duitnow-dark: #21231D;
+            --bg-light: #FBF2EA;
+            --card-bg: #FFFFFF;
+            --error-red: #D32F2F;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--duitnow-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Responsive Grid Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr; /* 2 Columns on PC/Tablet */
+                align-items: start;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(237, 46, 103, 0.1);
+            border-top: 6px solid var(--duitnow-pink);
+        }
+
+        h2 {
+            color: var(--duitnow-pink);
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #fdf0f4;
+            padding-bottom: 10px;
+        }
+
+        /* Scanner Area */
+        #reader {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px dashed var(--duitnow-pink);
+            margin-bottom: 20px;
+        }
+
+        #reader button {
+            background-color: var(--duitnow-pink);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        /* Results Area */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+
+        .data-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .data-value {
+            font-weight: 600;
+            text-align: right;
+            word-break: break-all;
+            max-width: 60%;
+        }
+
+        .error-box {
+            background: #ffebee;
+            color: var(--error-red);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid var(--error-red);
+            font-weight: bold;
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        /* Generator Area */
+        .generator-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .generator-container.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .controls {
+            width: 100%;
+            background: #fdf0f4;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        input[type="color"] {
+            border: none;
+            width: 50px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid var(--duitnow-pink);
+            border-radius: 6px;
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-download {
+            background: var(--duitnow-pink);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover { background: #d02055; }
+
+        .placeholder-text {
+            text-align: center;
+            color: #aaa;
+            font-style: italic;
+            margin: 40px 0;
+        }
+                .site-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(237, 46, 103, 0.3);
+            color: #888;
+            font-size: 0.9rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .site-footer .disclaimer {
+            font-size: 0.75rem;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- LEFT COLUMN: Scanner & Data -->
+        <div class="card">
+            <h2>1. Scan & Analyze</h2>
+            
+            <div id="reader"></div>
+            <div id="error-output" class="error-box"></div>
+
+            <div id="result-data" style="display: none;">
+                <div class="data-row">
+                    <span class="data-label">Account Name</span>
+                    <span id="res-name" class="data-value">-</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Bank</span>
+                    <span id="res-bank" class="data-value">-</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label" id="label-acc">Account Number</span>
+                    <span id="res-acc" class="data-value" style="font-family: monospace;">-</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Amount (RM)</span>
+                    <span id="res-amount" class="data-value">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Generator & Customizer -->
+        <div class="card generator-container" id="generator-card">
+            <h2>2. Customize QR</h2>
+            
+            <div id="qr-placeholder" class="placeholder-text">
+                Scan a DuitNow QR code first to unlock the customizer.
+            </div>
+
+            <!-- The Rebuilt QR renders here -->
+            <div id="qr-display-wrapper" style="display: none; background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; margin: 20px 0;">
+                
+                <img id="top-duitnow-logo" src="duitnow-logo.svg" alt="DuitNow" style="height: 45px; margin-bottom: 15px; display: inline-block;">
+                
+                <div id="generated-qr"></div>
+        
+            </div>
+
+            <div class="controls" id="qr-controls" style="display: none;">
+                <div class="control-group">
+                    <span style="font-weight: 600;">QR Color:</span>
+                    <input type="color" id="color-picker" value="#000000">
+                </div>
+                
+                <div class="control-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="logo-toggle" checked style="width:18px; height:18px;">
+                        Overlay DuitNow Logo
+                    </label>
+                </div>
+
+                <button class="btn-download" id="btn-download">Download Custom QR</button>
+            </div>
+        </div>
+    </div>
+    <div class="site-footer">
+        <strong>&copy; IHZAQ © 2026</strong>
+        <div class="disclaimer">
+            This tool is an independent developer project. It is not affiliated with, endorsed by, or associated with Payments Network Malaysia Sdn Bhd (PayNet), DuitNow, or any listed financial institutions.
+        </div>
+    </div>
+    <script>
+        // Global variables
+        let currentRawData = null;
+        let qrCodeObj = null;
+
+        // The Master Bank Dictionary
+                // Complete PayNet Acquirer ID Master Dictionary
+        const acquirerIds = {
+            "420709": "Bank Simpanan Nasional",
+            "432134": "Al Rajhi Banking & Investment Corporation",
+            "432310": "MBSB Bank Berhad",
+            "501664": "Affin Bank Berhad",
+            "501854": "CIMB Bank Berhad",
+            "504324": "OCBC Bank Berhad",
+            "504374": "Alliance Bank Malaysia Berhad",
+            "519469": "United Overseas Bank (Malaysia) Berhad",
+            "539981": "Standard Chartered Bank Malaysia Berhad",
+            "564160": "RHB Bank Berhad",
+            "564162": "Public Bank Berhad",
+            "564167": "Bank Muamalat Malaysia Berhad",
+            "564169": "AmBank Malaysia Berhad",
+            "588734": "Malayan Banking Berhad (Maybank)",
+            "588830": "Hong Leong Bank Berhad",
+            "589267": "Bank Kerjasama Rakyat Malaysia Berhad",
+            "589170": "Citibank Berhad",
+            "589373": "Bank Pertanian Malaysia Berhad (Agrobank)",
+            "589836": "HSBC Bank Berhad",
+            "603346": "Bank Islam Malaysia Berhad",
+            "629152": "Bank of China (M) Berhad",
+            "629188": "Bank of America (M) Berhad",
+            "629196": "MUFG Bank (Malaysia) Berhad",
+            "629204": "BNP Paribas Malaysia Berhad",
+            "629212": "JP Morgan Chase Bank Berhad",
+            "629220": "Mizuho Bank (Malaysia) Berhad",
+            "629238": "Sumitomo Mitsui Banking Corporation",
+            "629246": "Deutsche Bank (M) Berhad",
+            "629253": "Industrial and Commercial Bank of China",
+            "629261": "China Construction Bank (Malaysia) Berhad",
+            "629279": "GX Bank Berhad",
+            "629287": "YTL Digital Bank Berhad",
+            "629295": "AEON Bank (M) Berhad",
+            "629303": "Boost Bank Berhad",
+            "629311": "KAF Investment Bank Berhad",
+            "639406": "Kuwait Finance House (Malaysia) Berhad",
+            "890004": "ShopeePay Malaysia Sdn Bhd",
+            "890012": "BigPay Malaysia Sdn Bhd",
+            "890020": "Fave Asia Technologies Sdn Bhd",
+            "890038": "Finexus Cards Sdn Bhd",
+            "890046": "GPay Network (M) Sdn Bhd (GrabPay)",
+            "890053": "TNG Digital Sdn Bhd (Touch 'n Go)",
+            "890061": "Axiata Digital eCode Sdn Bhd (Boost)",
+            "890079": "iPay88 (M) Sdn Bhd",
+            "890087": "Razer Merchant Services Sdn Bhd",
+            "890095": "Revenue Solution Sdn Bhd",
+            "890103": "GHL Cardpay Sdn Bhd",
+            "890111": "Merchantrade Asia Sdn Bhd",
+            "890129": "Setel Ventures Sdn Bhd",
+            "890137": "Stripe Payments Singapore Pte Ltd",
+            "890145": "Fass Payment Solutions Sdn Bhd",
+            "890152": "Kiplepay Sdn Bhd",
+            "890160": "Curlec Sdn Bhd",
+            "890178": "Instapay Technologies Sdn Bhd",
+            "890186": "Global Payments Asia-Pacific Limited",
+            "890194": "Payex PLT",
+            "890202": "SiliconNet Technologies Sdn Bhd",
+            "890210": "MobilityOne Sdn Bhd",
+            "890228": "Koperasi Co-opbank Pertama Malaysia",
+            "890236": "Beez Fintech Sdn Bhd",
+            "890244": "Boost Connect Sdn Bhd",
+            "890251": "UniPin (M) Sdn Bhd",
+            "890269": "Paydibs Sdn Bhd",
+            "890277": "Mobiedge E-commerce Sdn Bhd",
+            "890285": "2C2P System Sdn Bhd",
+            "890293": "Ampersand Pay Sdn Bhd",
+            "890301": "ManagePay Systems Sdn Bhd",
+            "890319": "Wannapay Sdn Bhd",
+            "890327": "MRuncit Commerce Sdn Bhd",
+            "898989": "JomPAY"
+        };
+
+        // Core EMVCo Parser
+        function parseEMVCo(payload) {
+            let index = 0;
+            let tags = {};
+            while (index < payload.length) {
+                if (index + 4 > payload.length) break;
+                let id = payload.substring(index, index + 2);
+                let length = parseInt(payload.substring(index + 2, index + 4), 10);
+                if (isNaN(length)) throw new Error(`Malformed tag length at ${id}`);
+                tags[id] = payload.substring(index + 4, index + 4 + length);
+                index += 4 + length;
+            }
+            return tags;
+        }
+
+        // Analysis Logic
+        function analyzeDuitNow(qrData) {
+            const mainTags = parseEMVCo(qrData);
+            if (mainTags['00'] !== '01' && mainTags['00'] !== '02') {
+                throw new Error("Not a standard payment QR code.");
+            }
+
+            let result = {
+                name: mainTags['59'] || "Unknown",
+                amount: mainTags['54'] ? mainTags['54'] : "Any Amount",
+                bank: "Unknown Bank",
+                accountNum: "Not Found",
+                isProxy: false
+            };
+
+            const merchantBlock = mainTags['26'] || mainTags['27'];
+            if (merchantBlock) {
+                const subTags = parseEMVCo(merchantBlock);
+                if (subTags['01']) result.bank = acquirerIds[subTags['01']] || `Unknown (${subTags['01']})`;
+                if (subTags['02']) {
+                    result.accountNum = subTags['02'];
+                    if (/[a-zA-Z]/.test(result.accountNum)) result.isProxy = true;
+                }
+            }
+            return result;
+        }
+
+        // Initialize QR Generator Library
+        function initQRGenerator() {
+            qrCodeObj = new QRCodeStyling({
+                width: 250,
+                height: 250,
+                type: "svg", // Render as SVG for crisp scaling
+                data: "placeholder",
+                dotsOptions: {
+                    color: "#000000",
+                    type: "rounded" // Gives it that modern, premium look
+                },
+                backgroundOptions: { color: "#ffffff" },
+                cornersSquareOptions: { type: "extra-rounded" }
+            });
+            qrCodeObj.append(document.getElementById("generated-qr"));
+        }
+
+        // Live Update Function for the QR Code
+                // Live Update Function for the QR Code
+        function liveUpdateQR() {
+            if (!currentRawData) return;
+            const chosenColor = document.getElementById('color-picker').value;
+            const showLogo = document.getElementById('logo-toggle').checked;
+
+            // Toggle the HTML logo on top
+            document.getElementById('top-duitnow-logo').style.display = showLogo ? "inline-block" : "none";
+
+            // Update only the colors in the QR canvas
+            qrCodeObj.update({
+                data: currentRawData,
+                dotsOptions: { color: chosenColor },
+                cornersSquareOptions: { color: chosenColor }
+            });
+        }
+
+
+        // Callback when Camera scans successfully
+        function onScanSuccess(decodedText) {
+            document.getElementById('error-output').style.display = 'none';
+
+            try {
+                // 1. Analyze Data
+                const analysis = analyzeDuitNow(decodedText);
+                document.getElementById('res-name').innerText = analysis.name;
+                document.getElementById('res-bank').innerText = analysis.bank;
+                document.getElementById('res-acc').innerText = analysis.accountNum;
+                document.getElementById('label-acc').innerText = analysis.isProxy ? "Proxy ID" : "Account Number";
+                document.getElementById('res-amount').innerText = analysis.amount;
+                document.getElementById('result-data').style.display = 'block';
+
+                // 2. Unlock Generator
+                currentRawData = decodedText;
+                document.getElementById('generator-card').classList.add('active');
+                document.getElementById('qr-placeholder').style.display = 'none';
+                document.getElementById('qr-display-wrapper').style.display = 'block';
+                document.getElementById('qr-controls').style.display = 'flex';
+
+                // 3. Render the Rebuilt QR
+                liveUpdateQR();
+
+            } catch (err) {
+                const errorBox = document.getElementById('error-output');
+                errorBox.innerText = `⚠️ ${err.message}`;
+                errorBox.style.display = 'block';
+            }
+        }
+
+        // Attach Event Listeners to Controls
+        document.getElementById('color-picker').addEventListener('input', liveUpdateQR);
+        document.getElementById('logo-toggle').addEventListener('change', liveUpdateQR);
+        document.getElementById('btn-download').addEventListener('click', () => {
+            if (qrCodeObj && currentRawData) {
+                qrCodeObj.download({ name: "Custom_DuitNow_QR", extension: "png" });
+            }
+        });
+
+        // Start Everything
+        initQRGenerator();
+        let scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+        scanner.render(onScanSuccess);
+
+    </script>
+</body>
+</html>
