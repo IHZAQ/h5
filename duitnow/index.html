@@ -30,7 +30,9 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Stacks everything top-to-bottom */
+            align-items: center;    /* Centers everything horizontally */
+            min-height: 100vh;      /* Makes sure the body takes up the full screen height */
         }
 
         /* Responsive Grid Layout */
@@ -200,6 +202,18 @@
             text-align: center;
             margin-top: 40px;
             padding-top: 20px;
+            border-top: 1px dashed rgba(237, 46, 103, 0.3);
+            color: #888;
+            font-size: 0.9rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .site-footer {
+            text-align: center;
+            margin-top: auto; /* Pushes the footer to the absolute bottom */
+            padding-top: 20px;
+            padding-bottom: 10px; /* Gives it a little breathing room at the bottom */
             border-top: 1px dashed rgba(237, 46, 103, 0.3);
             color: #888;
             font-size: 0.9rem;
