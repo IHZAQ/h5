@@ -33,8 +33,11 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Stacks everything top-to-bottom */
+            align-items: center;    /* Centers everything horizontally */
+            min-height: 100vh;      /* Makes sure the body takes up the full screen height */
         }
+
 
         /* Responsive Grid Layout */
         .dashboard {
@@ -199,6 +202,27 @@
             font-style: italic;
             margin: 40px 0;
         }
+
+                /* Footer Container */
+        .site-footer {
+            text-align: center;
+            margin-top: auto; /* This is the magic line that pushes it to the bottom */
+            padding-top: 20px;
+            padding-bottom: 10px;
+            border-top: 1px dashed rgba(237, 46, 103, 0.3);
+            color: #888;
+            font-size: 0.9rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        /* Disclaimer Text Inside the Footer */
+        .site-footer .disclaimer {
+            font-size: 0.75rem;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
     </style>
 </head>
 <body>
@@ -263,6 +287,13 @@
 
                 <button class="btn-download" id="btn-download">Download Custom QR</button>
             </div>
+        </div>
+    </div>
+    
+    <div class="site-footer">
+        <strong>&copy; 2026 IHZAQ</strong>
+        <div class="disclaimer">
+            This tool is an independent developer project. It is not affiliated with, endorsed by, or associated with Payments Network Malaysia Sdn Bhd (PayNet), DuitNow, or any listed financial institutions.
         </div>
     </div>
 
